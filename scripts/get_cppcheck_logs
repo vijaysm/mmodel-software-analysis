@@ -20,7 +20,7 @@ else
 fi
 
 CPPCHECK_PROG=`which cppcheck`
-CPPCHECKHTML_PROG=`which cppcheck-htmlreport`
+CPPCHECKHTML_PROG="scripts/cppcheck-htmlreport.py"
 # CPPCHECK_OPTIONS="--template gcc --enable=all -f --xml"
 CPPCHECK_OPTIONS="--template '{severity},{id},{file}:{line},{message}' --inline-suppr  --enable=portability,performance,warning --force --xml"
 
