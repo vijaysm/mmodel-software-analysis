@@ -131,9 +131,12 @@ def GetNSources(toolname):
 
 # 1) First let us clone the repository
 CloneOpOut = CloneRepo(tool.Name, tool.VCS, tool.Repository)
+
 # 2) Find out the number of sources and types
 Sourcelist = GetNSources(tool.Name)
+
 # 3) Run Metrix++ for C/C++/Java and PyLint for Python
+ExecCommandStreaming("scripts/get_metrixpp_logs " + tool.Name + " " + sandbox_dir + "/" + tool.Name)
 
 # 4) Launch static analyzer depending on languages supported
 #        C/C++: cppcheck (cppcheck.sourceforge.net)
@@ -146,5 +149,4 @@ if cmd_exists("pylint"):
 # 5) Aggregate static analyzer results
 #        a) For cppcheck, parse XML to find number of "errors"
 #        b) For PyLint, parse output to find "errors"
-
 
