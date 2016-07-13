@@ -144,7 +144,8 @@ if cmd_exists("cppcheck"):
     ExecCommandStreaming("scripts/get_cppcheck_logs " + tool.Name + " " + sandbox_dir + "/" + tool.Name)
 #        Python: PyLint
 if cmd_exists("pylint"):
-    ExecCommandStreaming("find " + sandbox_dir + "/" + tool.Name + "/ -name '*.py' | xargs pylint -E")
+    ExecCommand("mkdir -p " + sandbox_dir + "/pylint")
+    ExecCommandStreaming("find " + sandbox_dir + "/" + tool.Name + "/ -name '*.py' | xargs pylint -E > " + sandbox_dir + "/pylint/" + tool.Name + ".txt")
 
 # 5) Aggregate static analyzer results
 #        a) For cppcheck, parse XML to find number of "errors"
