@@ -22,7 +22,7 @@ fi
 CPPCHECK_PROG=`which cppcheck`
 CPPCHECKHTML_PROG="scripts/cppcheck-htmlreport.py"
 # CPPCHECK_OPTIONS="--template gcc --enable=all -f --xml"
-CPPCHECK_OPTIONS="--template '{severity},{id},{file}:{line},{message}' --inline-suppr  --enable=portability,performance,warning --force --xml"
+CPPCHECK_OPTIONS="--template '{severity},{id},{file}:{line},{message}' --inline-suppr --enable=portability,performance,warning -f -q --xml"
 
 # Query and store data in a variable
 OUTPUT_LOG="$CPPCHECK_PROG $CPPCHECK_OPTIONS -j 4 $PACKAGE_SRCDIRS  2> $CPPCHECK_OUTDIR/cppcheck.xml"
@@ -36,8 +36,8 @@ echo "$GENLOGS"
 eval "$GENLOGS"
 chmod -R 755 $CPPCHECK_OUTDIR
 
-echo "-----------------------------------------"
 CPPCHECK_ERRORS=`grep 'severity="error' $CPPCHECK_OUTDIR/cppcheck.xml | wc -l`
+echo "-----------------------------------------"
 echo "|  Number of severe errors = $CPPCHECK_ERRORS"
 echo "-----------------------------------------"
 
