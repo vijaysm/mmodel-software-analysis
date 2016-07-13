@@ -22,7 +22,7 @@ class MModelTool:
         return "[ " + self.Name + " ] |VCS|: " + self.VCS + ", |Supported Languages|: " + self.Languages + ", |Repository|: " + self.Repository
 
 SurveyTools = []
-with open('mmodel-survey-tools.csv', 'rb') as csvfile:
+with open('data/mmodel-survey-tools.csv', 'rb') as csvfile:
     rowreader = csv.DictReader(csvfile)
     for row in rowreader:
         SurveyTools.append(row)
@@ -34,13 +34,16 @@ with open('mmodel-survey-tools.csv', 'rb') as csvfile:
 tool = MModelTool(SurveyTools[4])
 print tool
 
+def cmd_exists(cmd):
+    return subprocess.call("type " + cmd, shell=True, 
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
+
 def ExecCommand(shellCommand):
     import sys, subprocess
     p = subprocess.Popen(shellCommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     (output, err) = p.communicate()
     #print "[CMD: ", shellCommand, "]:\n", output
     return output.rstrip('\n')
-
 
 def ExecCommandStreaming(shellCommand):
     import sys, subprocess
@@ -131,9 +134,15 @@ CloneOpOut = CloneRepo(tool.Name, tool.VCS, tool.Repository)
 # 2) Find out the number of sources and types
 Sourcelist = GetNSources(tool.Name)
 # 3) Run Metrix++ for C/C++/Java and PyLint for Python
+
 # 4) Launch static analyzer depending on languages supported
 #        C/C++: cppcheck (cppcheck.sourceforge.net)
+if cmd_exists("cppcheck"):
+    ExecCommandStreaming("scripts/get_cppcheck_logs " + tool.Name + " " + sandbox_dir + "/" + tool.Name)
 #        Python: PyLint
+if cmd_exists("pylint"):
+    ExecCommandStreaming("find " + sandbox_dir + "/" + tool.Name + "/ -name '*.py' | xargs pylint -E")
+
 # 5) Aggregate static analyzer results
 #        a) For cppcheck, parse XML to find number of "errors"
 #        b) For PyLint, parse output to find "errors"
