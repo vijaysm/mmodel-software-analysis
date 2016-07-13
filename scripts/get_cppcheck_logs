@@ -1,0 +1,45 @@
+#!/bin/bash
+
+if [ -z "$1" ]
+then
+  PACKAGE="PACKAGE"
+else
+  PACKAGE="$1"
+fi
+
+# remove old log directory and recreate if needed
+CPPCHECK_OUTDIR="cppcheck-$PACKAGE"
+mkdir -p $CPPCHECK_OUTDIR
+
+if [ $# -gt 1 ]
+then
+  shift 1
+  PACKAGE_SRCDIRS="$*"
+else
+  PACKAGE_SRCDIRS="."
+fi
+
+CPPCHECK_PROG=`which cppcheck`
+CPPCHECKHTML_PROG=`which cppcheck-htmlreport`
+# CPPCHECK_OPTIONS="--template gcc --enable=all -f --xml"
+CPPCHECK_OPTIONS="--template '{severity},{id},{file}:{line},{message}' --inline-suppr  --enable=portability,performance,warning --force --xml"
+
+# Query and store data in a variable
+OUTPUT_LOG="$CPPCHECK_PROG $CPPCHECK_OPTIONS -j 4 $PACKAGE_SRCDIRS  2> $CPPCHECK_OUTDIR/cppcheck.xml"
+
+# Generate HTML output from the cppcheck scripts
+GENLOGS="$CPPCHECKHTML_PROG --title=$PACKAGE --file=$CPPCHECK_OUTDIR/cppcheck.xml --report-dir=$CPPCHECK_OUTDIR --source-dir=."
+
+echo "$OUTPUT_LOG"
+eval "$OUTPUT_LOG"
+echo "$GENLOGS"
+eval "$GENLOGS"
+chmod -R 755 $CPPCHECK_OUTDIR
+
+echo "-----------------------------------------"
+CPPCHECK_ERRORS=`grep 'severity="error' $CPPCHECK_OUTDIR/cppcheck.xml | wc -l`
+echo "|  Number of severe errors = $CPPCHECK_ERRORS"
+echo "-----------------------------------------"
+
+exit 0
+
