@@ -1,0 +1,42 @@
+#!/bin/bash
+
+if [ -z "$1" ]
+then
+  PACKAGE="PACKAGE"
+else
+  PACKAGE="$1"
+fi
+
+# remove old log directory and recreate if needed
+METRIXPP_OUTDB="sandbox/metrixpp/mpp-${PACKAGE}.db"
+METRIXPP_SUMMARY="sandbox/metrixpp/mpp-${PACKAGE}.txt"
+mkdir -p "sandbox/metrixpp"
+
+if [ $# -gt 1 ]
+then
+  shift 1
+  PACKAGE_SRCDIRS="$*"
+else
+  PACKAGE_SRCDIRS="."
+fi
+
+MPP_COLLECT_OPTIONS="--sccc --sclent --sctc --scmn --sclc --sclcom --sclt --sgs --log-level=ERROR"
+MPP_VIEW_OPTIONS="--log-level=ERROR"
+
+# Query and store data in a variable
+MPP_COLLECT_LOG="python contrib/metrixplusplus-1.3.168/metrix++.py collect --db-file=$METRIXPP_OUTDB $MPP_COLLECT_OPTIONS $PACKAGE_SRCDIRS"
+
+# Generate HTML output from the cppcheck scripts
+MPP_VIEW_LOGS="python contrib/metrixplusplus-1.3.168/metrix++.py view --db-file=$METRIXPP_OUTDB $MPP_VIEW_OPTIONS > $METRIXPP_SUMMARY"
+
+echo "$MPP_COLLECT_LOG"
+eval "$MPP_COLLECT_LOG"
+eval "$MPP_VIEW_LOGS"
+
+echo "--------------------------------------------------------------------------"
+MPP_SUMMARY='grep ":: info" -A4 $METRIXPP_SUMMARY'
+eval $MPP_SUMMARY
+echo "--------------------------------------------------------------------------"
+
+exit 0
+
