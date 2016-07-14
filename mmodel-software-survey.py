@@ -31,7 +31,7 @@ with open('data/mmodel-survey-tools.csv', 'rb') as csvfile:
 # Replace with a recursive parse of the CSV file to get the tool list
 # tool = MModelTool('DTK','C++','Git','https://github.com/ORNL-CEES/DataTransferKit.git')
 #tool = MModelTool('DTK','C++','None','ftp://ftp.mcs.anl.gov/pub/fathom/moab-nightly.tar.gz')
-tool = MModelTool(SurveyTools[4])
+tool = MModelTool(SurveyTools[3])
 print tool
 
 def cmd_exists(cmd):
@@ -139,13 +139,21 @@ Sourcelist = GetNSources(tool.Name)
 ExecCommandStreaming("scripts/get_metrixpp_logs " + tool.Name + " " + sandbox_dir + "/" + tool.Name)
 
 # 4) Launch static analyzer depending on languages supported
-#        C/C++: cppcheck (cppcheck.sourceforge.net)
-if cmd_exists("cppcheck"):
+
+# 4.a)       C/C++: cppcheck (cppcheck.sourceforge.net)
+if cmd_exists("cppcheck") and Sourcelist['C']+Sourcelist['C++'] > 0:
     ExecCommandStreaming("scripts/get_cppcheck_logs " + tool.Name + " " + sandbox_dir + "/" + tool.Name)
-#        Python: PyLint
-if cmd_exists("pylint"):
+
+# 4.b)       Python: PyLint
+if cmd_exists("pylint") and Sourcelist['Python'] > 0:
     ExecCommand("mkdir -p " + sandbox_dir + "/pylint")
     ExecCommandStreaming("find " + sandbox_dir + "/" + tool.Name + "/ -name '*.py' | xargs pylint -E > " + sandbox_dir + "/pylint/" + tool.Name + ".txt")
+
+# 4.c)       Python: Radon
+if cmd_exists("radon") and Sourcelist['Python'] > 0:
+    ExecCommand("mkdir -p " + sandbox_dir + "/radon")
+    ExecCommandStreaming("radon cc -a --total-average -s " + sandbox_dir + "/" + tool.Name + " > " + sandbox_dir + "/radon/" + tool.Name + ".txt")
+
 
 # 5) Aggregate static analyzer results
 #        a) For cppcheck, parse XML to find number of "errors"
