@@ -6,17 +6,19 @@ sandbox_dir = 'sandbox'
 subprocess.call(["mkdir", "-p", sandbox_dir])
 
 class MModelTool:
-    def __init__(self,Tool,langs,vcs,url):
+    def __init__(self,Tool,langs,vcs,url,paths):
         self.Name = Tool
         self.Languages = langs
         self.VCS = vcs
         self.Repository = url
+        self.Paths = paths
 
     def __init__(self,ToolDict):
         self.Name = ToolDict['Name']
         self.Languages = ToolDict['Languages']
         self.VCS = ToolDict['VCS']
         self.Repository = ToolDict['Repository']
+        self.Paths = ToolDict['Paths'].split('/')
 
     def __str__(self):
         return "[ " + self.Name + " ] |VCS|: " + self.VCS + ", |Supported Languages|: " + self.Languages + ", |Repository|: " + self.Repository
@@ -29,9 +31,9 @@ with open('data/mmodel-survey-tools.csv', 'rb') as csvfile:
     #print SurveyTools
 
 # Replace with a recursive parse of the CSV file to get the tool list
-# tool = MModelTool('DTK','C++','Git','https://github.com/ORNL-CEES/DataTransferKit.git')
-#tool = MModelTool('DTK','C++','None','ftp://ftp.mcs.anl.gov/pub/fathom/moab-nightly.tar.gz')
-tool = MModelTool(SurveyTools[3])
+# tool = MModelTool('DTK','C++','Git','https://github.com/ORNL-CEES/DataTransferKit.git',[])
+#tool = MModelTool('MOAB','C++','None','ftp://ftp.mcs.anl.gov/pub/fathom/moab-nightly.tar.gz',[])
+tool = MModelTool(SurveyTools[0])
 print tool
 
 def cmd_exists(cmd):
@@ -123,36 +125,56 @@ def GetNSources(toolname):
             index = index + 1
         command = command + command_end
         source_count[key] = int(ExecCommand(command))
-    print source_count
     return source_count
 
-
+# Real program starts here #
 # For each of the tools, do the following actions
+enable_metrixpp = False
+enable_cppcheck = False
+enable_pylint = True
+enable_radon = False
 
 # 1) First let us clone the repository
 CloneOpOut = CloneRepo(tool.Name, tool.VCS, tool.Repository)
 
 # 2) Find out the number of sources and types
 Sourcelist = GetNSources(tool.Name)
+print '[',tool.Name,']','Source type count:', Sourcelist
 
 # 3) Run Metrix++ for C/C++/Java and PyLint for Python
-ExecCommandStreaming("scripts/get_metrixpp_logs " + tool.Name + " " + sandbox_dir + "/" + tool.Name)
+if enable_metrixpp:
+    ExecCommandStreaming("scripts/get_metrixpp_logs " + tool.Name + " " + sandbox_dir + "/" + tool.Name)
 
 # 4) Launch static analyzer depending on languages supported
 
 # 4.a)       C/C++: cppcheck (cppcheck.sourceforge.net)
-if cmd_exists("cppcheck") and Sourcelist['C']+Sourcelist['C++'] > 0:
+if cmd_exists("cppcheck") and Sourcelist['C']+Sourcelist['C++'] > 0 and enable_cppcheck:
     ExecCommandStreaming("scripts/get_cppcheck_logs " + tool.Name + " " + sandbox_dir + "/" + tool.Name)
 
 # 4.b)       Python: PyLint
-if cmd_exists("pylint") and Sourcelist['Python'] > 0:
+if cmd_exists("pylint") and Sourcelist['Python'] > 0 and enable_pylint:
     ExecCommand("mkdir -p " + sandbox_dir + "/pylint")
-    ExecCommandStreaming("find " + sandbox_dir + "/" + tool.Name + "/ -name '*.py' | xargs pylint -E > " + sandbox_dir + "/pylint/" + tool.Name + ".txt")
+    print '[',tool.Name,']','Performing static analysis on Python sources, with PyLint'
+    if not tool.Paths:
+        pysrc_dirs = sandbox_dir + "/" + tool.Name
+    else:
+        pysrc_dirs = " ".join([(sandbox_dir + "/" + tool.Name + "/" + s) for s in tool.Paths])
+    print '[',tool.Name,']','Python source directories =', pysrc_dirs
+    ExecCommandStreaming("pylint -E " + pysrc_dirs + " > " + sandbox_dir + "/pylint/" + tool.Name + ".txt")
+    pylint_errors = ExecCommand("grep '^E:' " + sandbox_dir + "/pylint/" + tool.Name + ".txt | wc -l")
+    print '[',tool.Name,']','Number of errors detected by PyLint:', pylint_errors
 
 # 4.c)       Python: Radon
-if cmd_exists("radon") and Sourcelist['Python'] > 0:
+if cmd_exists("radon") and Sourcelist['Python'] > 0 and enable_radon:
     ExecCommand("mkdir -p " + sandbox_dir + "/radon")
-    ExecCommandStreaming("radon cc -a --total-average -s " + sandbox_dir + "/" + tool.Name + " > " + sandbox_dir + "/radon/" + tool.Name + ".txt")
+    print '[',tool.Name,']','Running Radon to find "Cyclomatic Complexity"'
+    ExecCommand("radon cc -a --total-average -s " + sandbox_dir + "/" + tool.Name + " > " + sandbox_dir + "/radon/" + tool.Name + ".txt")
+    ExecCommandStreaming("grep 'Average complexity' " + sandbox_dir + "/radon/" + tool.Name + ".txt")
+    print '[',tool.Name,']','Running Radon to find "Maintainability Index"'
+    ExecCommand("radon mi -m -s " + sandbox_dir + "/" + tool.Name + " >> " + sandbox_dir + "/radon/" + tool.Name + ".txt")
+    print '[',tool.Name,']','Running Radon to find "Raw SLOC metrics"'
+    ExecCommand("radon raw -s " + sandbox_dir + "/" + tool.Name + " >> " + sandbox_dir + "/radon/" + tool.Name + ".txt")
+    ExecCommandStreaming("tail -n8 " + sandbox_dir + "/radon/" + tool.Name + ".txt")
 
 
 # 5) Aggregate static analyzer results
