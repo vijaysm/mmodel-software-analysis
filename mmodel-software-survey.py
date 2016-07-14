@@ -25,19 +25,6 @@ class MModelTool:
     def __str__(self):
         return "[ " + self.Name + " ] |VCS|: " + self.VCS + ", |Supported Languages|: " + self.Languages + ", |Repository|: " + self.Repository
 
-SurveyTools = []
-with open('data/mmodel-survey-tools.csv', 'rb') as csvfile:
-    rowreader = csv.DictReader(csvfile)
-    for row in rowreader:
-        SurveyTools.append(row)
-    # print SurveyTools
-
-# Replace with a recursive parse of the CSV file to get the tool list
-# tool = MModelTool('DTK','C++','Git','https://github.com/ORNL-CEES/DataTransferKit.git')
-# tool = MModelTool('DTK','C++','None','ftp://ftp.mcs.anl.gov/pub/fathom/moab-nightly.tar.gz')
-tool = MModelTool(SurveyTools[3])
-print tool
-
 
 def cmd_exists(cmd):
     return subprocess.call("type " + cmd, shell=True,
@@ -135,6 +122,18 @@ def GetNSources(toolname):
     print source_count
     return source_count
 
+SurveyTools = []
+with open('data/mmodel-survey-tools.csv', 'rb') as csvfile:
+    rowreader = csv.DictReader(csvfile)
+    for row in rowreader:
+        SurveyTools.append(row)
+    # print SurveyTools
+
+# Replace with a recursive parse of the CSV file to get the tool list
+# tool = MModelTool('DTK','C++','Git','https://github.com/ORNL-CEES/DataTransferKit.git')
+# tool = MModelTool('DTK','C++','None','ftp://ftp.mcs.anl.gov/pub/fathom/moab-nightly.tar.gz')
+tool = MModelTool(SurveyTools[3])
+print tool
 
 # For each of the tools, do the following actions
 
