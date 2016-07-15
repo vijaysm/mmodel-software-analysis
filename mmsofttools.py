@@ -7,11 +7,11 @@ subprocess.call(["mkdir", "-p", sandbox_dir])
 
 
 class MModelTool:
-    def __init__(self, toolDict):
-        self.name = toolDict['Name']
-        self.languages = toolDict['Languages']
-        self.vcs = toolDict['VCS']
-        self.repository = toolDict['Repository']
+    def __init__(self, name, languages, vcs, repository):
+        self.name = name
+        self.languages = languages
+        self.vcs = vcs
+        self.repository = repository
 
         self.c = False
         self.python = False
@@ -113,10 +113,10 @@ class MModelTool:
         result = Result()
 
         # 1) First let us clone the repository
-        result.repoOutput = self.cloneRepo()
+        result.repoOutput = self.cloneRepo()  # what is this outputting? goes from getGitRepo() -> execCommand()
 
         # 2) Find out the number of sources and types
-        result.sourceList = self.checkSource()
+        result.sourceCounts = self.checkSource()
 
         # 3) Run Metrix++ for C/C++/Java and cppcheck for C/C++
         self.analyzeJavaC()
@@ -138,7 +138,7 @@ class Result:
     '''A container object to store relevant results from the tool analysis
             Returns
             -------
-            self.sourceCount : ...
+            self.sourceCounts : ...
             self.repoOutput : ...
     '''
 
