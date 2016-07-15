@@ -17,7 +17,6 @@ class MModelTool:
         self.python = False
         self.java = False
 
-
     def __str__(self):
         return "[ " + self.name + " ] |VCS|: " + self.vcs + ", |Supported Languages|: " + self.languages + ", |Repository|: " + self.repository
 
