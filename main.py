@@ -1,4 +1,4 @@
-import mmsofttools as mmst
+import mmodel_software_analysis as mmst
 import csv
 
 surveyTools = []
