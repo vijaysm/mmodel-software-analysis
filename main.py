@@ -10,7 +10,6 @@ with open('data/mmodel-survey-tools.csv', 'rb') as csvfile:
         surveyTools.append(row)
 
 tool = mmst.MModelTool(**surveyTools[3])
-print tool
 
 result = tool.analyze()
 print result.sourceCounts
