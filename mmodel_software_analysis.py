@@ -82,35 +82,21 @@ class MModelTool:
         print sourceCount
         return sourceCount
 
-    def analyzeJavaC(self):
+    def analyzeMetrixPP(self):
         # run metrix++
         # runs regardless of source contents right now.  do we want to check for Java/C/C++?
         execCommandStreaming("./scripts/get_metrixpp_logs " + self.name + " " + sandbox_dir + "/" + self.name)
 
+        # TODO: parse output and return stats
+
+    def analyzeCPPcheck(self):
         # run cppcheck in installed and source contains C/C++ code
         if cmd_exists("cppcheck") and self.c is True:
             execCommandStreaming("scripts/get_cppcheck_logs " + self.name + " " + sandbox_dir + "/" + self.name)
 
         # TODO: parse output and return stats
 
-    def analyzePython(self):
-        # run pylint if installed and source contains Python code
-        if cmd_exists("pylint") and self.python is True:
-            # execCommand("mkdir -p " + sandbox_dir + "/pylint")
-            # execCommandStreaming("find " + sandbox_dir + "/" + self.name + "/ -name '*.py' | xargs pylint -E > " + sandbox_dir + "/pylint/" + self.name + ".txt")
-            execCommand("mkdir -p " + sandbox_dir + "/pylint")
-
-            print '[', self.name, ']', 'Performing static analysis on Python sources, with PyLint'
-            if not self.paths:
-                pysrc_dirs = sandbox_dir + "/" + self.name
-            else:
-                pysrc_dirs = " ".join([(sandbox_dir + "/" + self.name + "/" + s) for s in self.paths])
-            print '[', self.name, ']', 'Python source directories =', pysrc_dirs
-
-            execCommandStreaming("pylint -E " + pysrc_dirs + " > " + sandbox_dir + "/pylint/" + self.name + ".txt")
-            pylintErrors = execCommand("grep '^E:' " + sandbox_dir + "/pylint/" + self.name + ".txt | wc -l")
-            print '[', self.name, ']', 'Number of errors detected by PyLint:', pylintErrors
-
+    def analyzeRadon(self):
         # run radon if installed and source contains Python code
         if cmd_exists("radon") and self.python is True:
             # execCommand("mkdir -p " + sandbox_dir + "/radon")
@@ -129,6 +115,26 @@ class MModelTool:
             execCommandStreaming("tail -n8 " + sandbox_dir + "/radon/" + self.name + ".txt")
         # TODO: parse output and return stats
 
+    def analyzePyLint(self):
+        # run pylint if installed and source contains Python code
+        if cmd_exists("pylint") and self.python is True:
+            # execCommand("mkdir -p " + sandbox_dir + "/pylint")
+            # execCommandStreaming("find " + sandbox_dir + "/" + self.name + "/ -name '*.py' | xargs pylint -E > " + sandbox_dir + "/pylint/" + self.name + ".txt")
+            execCommand("mkdir -p " + sandbox_dir + "/pylint")
+
+            print '[', self.name, ']', 'Performing static analysis on Python sources, with PyLint'
+            if not self.paths:
+                pysrc_dirs = sandbox_dir + "/" + self.name
+            else:
+                pysrc_dirs = " ".join([(sandbox_dir + "/" + self.name + "/" + s) for s in self.paths])
+            print '[', self.name, ']', 'Python source directories =', pysrc_dirs
+
+            execCommandStreaming("pylint -E " + pysrc_dirs + " > " + sandbox_dir + "/pylint/" + self.name + ".txt")
+            pylintErrors = execCommand("grep '^E:' " + sandbox_dir + "/pylint/" + self.name + ".txt | wc -l")
+            print '[', self.name, ']', 'Number of errors detected by PyLint:', pylintErrors
+
+        # TODO: parse output and return stats
+
     def analyzeFortran(self):
         # TODO: add commands used for assessing Fortran source
         # TODO: parse output and return stats
@@ -144,10 +150,12 @@ class MModelTool:
         result.sourceCounts = self.checkSource()
 
         # 3) Run Metrix++ for C/C++/Java and cppcheck for C/C++
-        self.analyzeJavaC()
+        self.analyzeMetrixPP()
+        self.analyzeCPPcheck()
 
         # 4) Run PyLint and Radon for Python
-        self.analyzePython()
+        self.analyzeRadon()
+        self.analyzePyLint()
 
         # TODO: 5) Run * for Fortran
         # self.analyzeFortran()
