@@ -7,11 +7,12 @@ subprocess.call(["mkdir", "-p", sandbox_dir])
 
 
 class MModelTool:
-    def __init__(self, name, languages, vcs, repository):
+    def __init__(self, name, languages, vcs, repository, paths):
         self.name = name
         self.languages = languages
         self.vcs = vcs
         self.repository = repository
+        self.paths = paths
 
         self.c = False
         self.python = False
@@ -95,14 +96,37 @@ class MModelTool:
     def analyzePython(self):
         # run pylint if installed and source contains Python code
         if cmd_exists("pylint") and self.python is True:
+            # execCommand("mkdir -p " + sandbox_dir + "/pylint")
+            # execCommandStreaming("find " + sandbox_dir + "/" + self.name + "/ -name '*.py' | xargs pylint -E > " + sandbox_dir + "/pylint/" + self.name + ".txt")
             execCommand("mkdir -p " + sandbox_dir + "/pylint")
-            execCommandStreaming("find " + sandbox_dir + "/" + self.name + "/ -name '*.py' | xargs pylint -E > " + sandbox_dir + "/pylint/" + self.name + ".txt")
+
+            print '[', self.name, ']', 'Performing static analysis on Python sources, with PyLint'
+            if not self.paths:
+                pysrc_dirs = sandbox_dir + "/" + self.name
+            else:
+                pysrc_dirs = " ".join([(sandbox_dir + "/" + self.name + "/" + s) for s in self.paths])
+            print '[', self.name, ']', 'Python source directories =', pysrc_dirs
+
+            execCommandStreaming("pylint -E " + pysrc_dirs + " > " + sandbox_dir + "/pylint/" + self.name + ".txt")
+            pylintErrors = execCommand("grep '^E:' " + sandbox_dir + "/pylint/" + self.name + ".txt | wc -l")
+            print '[', self.name, ']', 'Number of errors detected by PyLint:', pylintErrors
 
         # run radon if installed and source contains Python code
         if cmd_exists("radon") and self.python is True:
+            # execCommand("mkdir -p " + sandbox_dir + "/radon")
+            # execCommandStreaming("radon cc -a --total-average -s " + sandbox_dir + "/" + self.name + " > " + sandbox_dir + "/radon/" + self.name + ".txt")
             execCommand("mkdir -p " + sandbox_dir + "/radon")
-            execCommandStreaming("radon cc -a --total-average -s " + sandbox_dir + "/" + self.name + " > " + sandbox_dir + "/radon/" + self.name + ".txt")
 
+            print '[', self.name, ']', 'Running Radon to find "Cyclomatic Complexity"'
+            execCommand("radon cc -a --total-average -s " + sandbox_dir + "/" + self.name + " > " + sandbox_dir + "/radon/" + self.name + ".txt")
+            execCommandStreaming("grep 'Average complexity' " + sandbox_dir + "/radon/" + self.name + ".txt")
+
+            print '[', self.name, ']', 'Running Radon to find "Maintainability Index"'
+            execCommand("radon mi -m -s " + sandbox_dir + "/" + self.name + " >> " + sandbox_dir + "/radon/" + self.name + ".txt")
+
+            print '[', self.name, ']', 'Running Radon to find "Raw SLOC metrics"'
+            execCommand("radon raw -s " + sandbox_dir + "/" + self.name + " >> " + sandbox_dir + "/radon/" + self.name + ".txt")
+            execCommandStreaming("tail -n8 " + sandbox_dir + "/radon/" + self.name + ".txt")
         # TODO: parse output and return stats
 
     def analyzeFortran(self):
