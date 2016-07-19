@@ -83,9 +83,9 @@ class MModelTool:
         return sourceCount
 
     def analyzeMetrixPP(self):
-        # run metrix++
-        # runs regardless of source contents right now.  do we want to check for Java/C/C++?
-        execCommandStreaming("./scripts/get_metrixpp_logs " + self.name + " " + sandbox_dir + "/" + self.name)
+        # run metrix++ if source contains C/C++ or Java code
+        if self.c is True or self.java is True:
+            execCommandStreaming("./scripts/get_metrixpp_logs " + self.name + " " + sandbox_dir + "/" + self.name)
 
         # TODO: parse output and return stats
 
@@ -113,6 +113,7 @@ class MModelTool:
             print '[', self.name, ']', 'Running Radon to find "Raw SLOC metrics"'
             execCommand("radon raw -s " + sandbox_dir + "/" + self.name + " >> " + sandbox_dir + "/radon/" + self.name + ".txt")
             execCommandStreaming("tail -n8 " + sandbox_dir + "/radon/" + self.name + ".txt")
+
         # TODO: parse output and return stats
 
     def analyzePyLint(self):
