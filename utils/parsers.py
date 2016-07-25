@@ -54,7 +54,8 @@ class MetrixPP:
                         self.lines.comments.average = avg
                         self.lines.comments.total = tot
 
-
-mpp = MetrixPP()
-mpp.parse('./sandbox/metrixpp/mpp-DTK.txt')
-print mpp.lines.comments.total
+# test/debug
+if __name__ == '__main__':
+    mpp = MetrixPP()
+    mpp.parse('./sandbox/metrixpp/mpp-DTK.txt')
+    print mpp.lines.comments.total
