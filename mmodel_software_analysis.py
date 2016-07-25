@@ -48,14 +48,6 @@ class MModelTool:
         extension_dict['Python'] = ['py']
         extension_dict['Java'] = ['java']
 
-        # are the following lines needed?
-        cppfiles = "-name '*.cpp' -o -name '*.hpp' -o -name '*.hh' -o -name '*.C' -o -name '*.cc'"
-        cfiles = "-name '*.c' -o -name '*.h'"
-        fortfiles = "-name '*.h90' -o -name '*.f90' -o -name '*.F90' -o -name '*.f' -o -name '*.F'"
-        pyfiles = "-name '*.py'"
-        javafiles = "-name '*.java'"
-        #
-
         sourceCount = {}
         for key, value in extension_dict.iteritems():
             srcexts = value
