@@ -1,8 +1,10 @@
 import subprocess
-import sys
 import os
 
-sandbox_dir = './sandbox'
+import utils.repository
+import utils.commands
+from utils import sandbox_dir
+
 subprocess.call(["mkdir", "-p", sandbox_dir])
 
 
@@ -25,13 +27,17 @@ class MModelTool:
     def cloneRepo(self):
         if not os.path.exists(sandbox_dir + "/" + self.name):
             if self.vcs == 'Git':
-                return getGitRepo(self.name, self.repository)
+                if self.name == 'Cactus':
+                    # special edge-case for cactus
+                    return utils.repository.getCactusRepo(self.name, self.repository, self.paths)
+                else:
+                    return utils.repository.getGitRepo(self.name, self.repository)
             elif self.vcs == 'Mercurial':
-                return getMercurialRepo(self.name, self.repository)
+                return utils.repository.getMercurialRepo(self.name, self.repository)
             elif self.vcs == 'Subversion':
-                return getSVNRepo(self.name, self.repository)
+                return utils.repository.getSVNRepo(self.name, self.repository)
             elif self.vcs == 'None':
-                return getTarball(self.name, self.repository)
+                return utils.repository.getTarball(self.name, self.repository)
             else:
                 raise ValueError('[' + self.name + ']' + 'Unhandled VCS type. Please check the key: ' + self.vcs + ' and URL:' + self.repository)
 
@@ -59,7 +65,7 @@ class MModelTool:
                 command = command + "-name '*." + srcext + "' "
                 index = index + 1
             command = command + command_end
-            sourceCount[key] = int(execCommand(command))
+            sourceCount[key] = int(utils.commands.execCommand(command))
 
         # store booleans for each code type if source files present
         if sourceCount['C'] + sourceCount['C++'] > 0:
@@ -77,43 +83,43 @@ class MModelTool:
     def analyzeMetrixPP(self):
         # run metrix++ if source contains C/C++ or Java code
         if self.c is True or self.java is True:
-            execCommandStreaming("./scripts/get_metrixpp_logs " + self.name + " " + sandbox_dir + "/" + self.name)
+            utils.commands.execCommandStreaming("./scripts/get_metrixpp_logs " + self.name + " " + sandbox_dir + "/" + self.name)
 
         # TODO: parse output and return stats
 
     def analyzeCPPcheck(self):
         # run cppcheck in installed and source contains C/C++ code
-        if cmd_exists("cppcheck") and self.c is True:
-            execCommandStreaming("scripts/get_cppcheck_logs " + self.name + " " + sandbox_dir + "/" + self.name)
+        if utils.commands.cmd_exists("cppcheck") and self.c is True:
+            utils.commands.execCommandStreaming("scripts/get_cppcheck_logs " + self.name + " " + sandbox_dir + "/" + self.name)
 
         # TODO: parse output and return stats
 
     def analyzeRadon(self):
         # run radon if installed and source contains Python code
-        if cmd_exists("radon") and self.python is True:
+        if utils.commands.cmd_exists("radon") and self.python is True:
             # execCommand("mkdir -p " + sandbox_dir + "/radon")
             # execCommandStreaming("radon cc -a --total-average -s " + sandbox_dir + "/" + self.name + " > " + sandbox_dir + "/radon/" + self.name + ".txt")
-            execCommand("mkdir -p " + sandbox_dir + "/radon")
+            utils.commands.execCommand("mkdir -p " + sandbox_dir + "/radon")
 
             print '[', self.name, ']', 'Running Radon to find "Cyclomatic Complexity"'
-            execCommand("radon cc -a --total-average -s " + sandbox_dir + "/" + self.name + " > " + sandbox_dir + "/radon/" + self.name + ".txt")
-            execCommandStreaming("grep 'Average complexity' " + sandbox_dir + "/radon/" + self.name + ".txt")
+            utils.commands.execCommand("radon cc -a --total-average -s " + sandbox_dir + "/" + self.name + " > " + sandbox_dir + "/radon/" + self.name + ".txt")
+            utils.commands.execCommandStreaming("grep 'Average complexity' " + sandbox_dir + "/radon/" + self.name + ".txt")
 
             print '[', self.name, ']', 'Running Radon to find "Maintainability Index"'
-            execCommand("radon mi -m -s " + sandbox_dir + "/" + self.name + " >> " + sandbox_dir + "/radon/" + self.name + ".txt")
+            utils.commands.execCommand("radon mi -m -s " + sandbox_dir + "/" + self.name + " >> " + sandbox_dir + "/radon/" + self.name + ".txt")
 
             print '[', self.name, ']', 'Running Radon to find "Raw SLOC metrics"'
-            execCommand("radon raw -s " + sandbox_dir + "/" + self.name + " >> " + sandbox_dir + "/radon/" + self.name + ".txt")
-            execCommandStreaming("tail -n8 " + sandbox_dir + "/radon/" + self.name + ".txt")
+            utils.commands.execCommand("radon raw -s " + sandbox_dir + "/" + self.name + " >> " + sandbox_dir + "/radon/" + self.name + ".txt")
+            utils.commands.execCommandStreaming("tail -n8 " + sandbox_dir + "/radon/" + self.name + ".txt")
 
         # TODO: parse output and return stats
 
     def analyzePyLint(self):
         # run pylint if installed and source contains Python code
-        if cmd_exists("pylint") and self.python is True:
+        if utils.commands.cmd_exists("pylint") and self.python is True:
             # execCommand("mkdir -p " + sandbox_dir + "/pylint")
             # execCommandStreaming("find " + sandbox_dir + "/" + self.name + "/ -name '*.py' | xargs pylint -E > " + sandbox_dir + "/pylint/" + self.name + ".txt")
-            execCommand("mkdir -p " + sandbox_dir + "/pylint")
+            utils.commands.execCommand("mkdir -p " + sandbox_dir + "/pylint")
 
             print '[', self.name, ']', 'Performing static analysis on Python sources, with PyLint'
             if not self.paths:
@@ -122,8 +128,8 @@ class MModelTool:
                 pysrc_dirs = " ".join([(sandbox_dir + "/" + self.name + "/" + s) for s in self.paths])
             print '[', self.name, ']', 'Python source directories =', pysrc_dirs
 
-            execCommandStreaming("pylint -E " + pysrc_dirs + " > " + sandbox_dir + "/pylint/" + self.name + ".txt")
-            pylintErrors = execCommand("grep '^E:' " + sandbox_dir + "/pylint/" + self.name + ".txt | wc -l")
+            utils.commands.execCommandStreaming("pylint -E " + pysrc_dirs + " > " + sandbox_dir + "/pylint/" + self.name + ".txt")
+            pylintErrors = utils.commands.execCommand("grep '^E:' " + sandbox_dir + "/pylint/" + self.name + ".txt | wc -l")
             print '[', self.name, ']', 'Number of errors detected by PyLint:', pylintErrors
 
         # TODO: parse output and return stats
@@ -170,53 +176,3 @@ class Result:
 
     def __init__(self):
         pass
-
-
-def cmd_exists(cmd):
-    return subprocess.call("type " + cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
-
-
-def execCommand(shellCommand):
-    p = subprocess.Popen(shellCommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    (output, err) = p.communicate()
-    # print "[CMD: ", shellCommand, "]:\n", output
-    return output.rstrip('\n')
-
-
-def execCommandStreaming(shellCommand):
-    p = subprocess.Popen(shellCommand, shell=True, stderr=subprocess.PIPE)
-    while True:
-        out = p.stderr.read(64)
-        if out == '' and p.poll() is not None:
-            break
-        if out != '':
-            sys.stdout.write(out)
-            sys.stdout.flush()
-
-
-def getGitRepo(toolname, giturl):
-    command = "git clone " + giturl + " " + sandbox_dir + "/" + toolname
-    print '[', toolname, ']', 'Cloning Git repository from URL:', giturl
-    return execCommand(command)
-
-
-def getSVNRepo(toolname, svnurl):
-    command = "svn checkout " + svnurl + " " + sandbox_dir + "/" + toolname
-    print '[', toolname, ']', 'Cloning Subversion repository from URL:', svnurl
-    return execCommand(command)
-
-
-def getMercurialRepo(toolname, hgurl):
-    command = "hg clone " + hgurl + " " + sandbox_dir + "/" + toolname
-    print '[', toolname, ']', 'Cloning Mercurial repository from URL:', hgurl
-    return execCommand(command)
-
-
-def getTarball(toolname, url):
-    filename = execCommand("basename " + url)
-    print '[', toolname, ']', 'Downloading tarball from URL:', url
-    wgetcommand = execCommand("wget -O " + sandbox_dir + "/" + filename + " " + url)
-    execCommand("mkdir -p " + sandbox_dir + "/" + toolname)
-    print '[', toolname, ']', 'Deflating the tarball into the directory:', sandbox_dir + "/" + toolname
-    untarcommand = execCommand("tar -xf " + sandbox_dir + "/" + filename + " -C " + sandbox_dir + "/" + toolname + " --strip-components=1")
-    return wgetcommand + "\n" + untarcommand
