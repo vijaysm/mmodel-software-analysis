@@ -57,22 +57,48 @@ class MetrixPP:
 
 class CPPcheck():
     def __init__(self):
-        self.magic = Attribute()
-        self.size = Attribute()
-        self.todo = Attribute()
-        self.complexity = Attribute()
-        self.lines = Attribute()
+        pass
 
-        self.lines.total = Attribute()
-        self.lines.code = Attribute()
-        self.lines.comments = Attribute()
+    def parse(self, fn):
+        # CPP check outputs in HTML. What do we want out of CPP check?
+        # Is there an option to output in something other than HTML?
+        # Skipping this parser for now...
+        pass
+
+
+class PyLint():
+    def __init__(self):
+        pass
 
     def parse(self, fn):
         pass
 
 
+class Radon():
+    def __init__(self):
+        pass
+
+    def parse(self, fn):
+        d = {}
+        with open(fn, 'r') as f:
+            lines = f.readlines()
+            for l in lines:
+                if ':' in l:
+                    key, val = l.split(':')
+                    key = key.strip().lower()
+                    val = val.strip().lower()
+                    try:
+                        d[key] = int(val)
+                    except:
+                        pass
+        return d
+
+
 # test/debug
 if __name__ == '__main__':
-    mpp = MetrixPP()
-    mpp.parse('./sandbox/metrixpp/mpp-DTK.txt')
-    print mpp.lines.comments.total
+    # mpp = MetrixPP()
+    # mpp.parse('./sandbox/metrixpp/mpp-DTK.txt')
+    # print mpp.lines.comments.total
+
+    r = Radon()
+    print r.parse('../sandbox/radon/DTK.txt')
