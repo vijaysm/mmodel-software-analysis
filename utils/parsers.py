@@ -54,6 +54,23 @@ class MetrixPP:
                         self.lines.comments.average = avg
                         self.lines.comments.total = tot
 
+
+class CPPcheck():
+    def __init__(self):
+        self.magic = Attribute()
+        self.size = Attribute()
+        self.todo = Attribute()
+        self.complexity = Attribute()
+        self.lines = Attribute()
+
+        self.lines.total = Attribute()
+        self.lines.code = Attribute()
+        self.lines.comments = Attribute()
+
+    def parse(self, fn):
+        pass
+
+
 # test/debug
 if __name__ == '__main__':
     mpp = MetrixPP()
