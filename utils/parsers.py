@@ -79,7 +79,9 @@ class Radon():
         pass
 
     def parse(self, fn):
+        d_tmp = {}
         d = {}
+        file_key = None
         with open(fn, 'r') as f:
             lines = f.readlines()
             for l in lines:
@@ -87,10 +89,22 @@ class Radon():
                     key, val = l.split(':')
                     key = key.strip().lower()
                     val = val.strip().lower()
+
                     try:
-                        d[key] = int(val)
+                        d_tmp[key] = int(val)
                     except:
                         pass
+
+                    if key == 'blank':
+                        d[file_key] = d_tmp
+                        d_tmp = {}
+
+                elif '.py\n' in l:
+                    file_key = l[:-1]
+
+                elif '** Total **' in l:
+                    file_key = 'total'
+
         return d
 
 
