@@ -134,7 +134,7 @@ class MModelTool:
                     files.append(os.path.join(dirpath, filename))
 
             for f in files:
-                utils.commands.execCommandStreaming('pylint -f parseable %s > %s/pylint/%s/%s.txt' % (f, sandbox_dir, self.name, os.path.basename(f)[:-3]))
+                utils.commands.execCommandStreaming('pylint %s > %s/pylint/%s/%s.txt' % (f, sandbox_dir, self.name, os.path.basename(f)[:-3]))
 
         # TODO: parse output and return stats
 
