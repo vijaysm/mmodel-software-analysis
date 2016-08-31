@@ -2,24 +2,12 @@ import re
 import os
 
 
-class Attribute:
+class MetrixPP:
     def __init__(self):
         pass
 
-
-class MetrixPP:
-    def __init__(self):
-        self.magic = Attribute()
-        self.size = Attribute()
-        self.todo = Attribute()
-        self.complexity = Attribute()
-        self.lines = Attribute()
-
-        self.lines.total = Attribute()
-        self.lines.code = Attribute()
-        self.lines.comments = Attribute()
-
     def parse(self, fn):
+        d = {}
         with open(fn, 'r') as f:
             for l in f:
                 if ':: ' and "'"in l:
@@ -30,29 +18,26 @@ class MetrixPP:
                     tot = float(re.findall(r"[-+]?\d*\.\d+|\d+", l.split(':')[-1].strip())[0])
 
                     if param == 'std.code.magic:numbers':
-                        self.magic.average = avg
-                        self.magic.total = tot
+                        key = 'std.code.magic:numbers'
                     elif param == 'std.general:size':
-                        self.size.average = avg
-                        self.size.total = tot
+                        key = 'std.general:size'
                     elif param == 'std.code.todo:comments':
-                        self.todo.average = avg
-                        self.todo.total = tot
+                        key = 'std.code.todo:comments'
                     elif param == 'std.code.complexity:cyclomatic':
-                        self.complexity.average = avg
-                        self.complexity.total = tot
+                        key = 'std.code.complexity:cyclomatic'
                     elif param == 'std.code.length:total':
-                        self.lines.total.average = avg
-                        self.lines.total.total = tot
+                        key = 'std.code.length:total'
                     elif param == 'std.code.lines:total':
-                        self.lines.total.total = avg
-                        self.lines.total.average = tot
+                        key = 'std.code.lines:total'
                     elif param == 'std.code.lines:code':
-                        self.lines.code.average = avg
-                        self.lines.code.total = tot
+                        key = 'std.code.lines:code'
                     elif param == 'std.code.lines:comments':
-                        self.lines.comments.average = avg
-                        self.lines.comments.total = tot
+                        key = 'std.code.lines:comments'
+
+                    d[key] = {}
+                    d[key]['average'] = avg
+                    d[key]['total'] = tot
+        return d
 
 
 class CPPcheck():
