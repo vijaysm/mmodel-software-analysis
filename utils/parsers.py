@@ -67,11 +67,13 @@ class PyLint():
             d[key] = {}
             d[key]['errors'] = []
             d[key]['duplication'] = []
-            d[key]['stats'] = []
+            d[key]['regions'] = []
             d[key]['messagesByCategory'] = []
             d[key]['messages'] = []
             d[key]['global'] = []
+            d[key]['metrics'] = []
             tableKey = None
+            print fn
             with open(fn, 'r') as f:
                 for l in f:
                     if l is None or '':
@@ -83,16 +85,52 @@ class PyLint():
                     elif 'Duplication' in l:
                         tableKey = 'duplication'
                     elif 'Statistics by type' in l:
-                        tableKey = 'stats'
+                        tableKey = 'regions'
                     elif 'Messages by category' in l:
                         tableKey = 'messagesByCategory'
                     elif l.strip() == 'Messages':
                         tableKey = 'messages'
                     elif 'Global evaluation' in l:
                         tableKey = 'global'
+                    elif 'Raw metrics' in l:
+                        tableKey = 'metrics'
+                    elif 'External dependencies' in l:
+                        tableKey = 'dependencies'
                     elif tableKey is not None and re.search(r"[a-z]", l) is not None:
-                        d[key][tableKey].append(l.strip())
+                        if tableKey is not 'errors' and tableKey is not 'global' and tableKey is not 'dependencies':
+                            tmp = l.strip()
+                            d[key][tableKey].append([s.strip() for s in tmp.split('|')][1:-1])
+                        else:
+                            d[key][tableKey].append(l.strip())
 
+            for table in d[key].keys():
+                if table is not 'errors' and table is not 'global' and table is not 'dependencies':
+                    # colnames = d[key][table][0]
+                    d_tmp = {}
+                    for i in range(1, len(d[key][table])):
+                        row = d[key][table][i]
+                        name = row[0]
+                        values = row[1:]
+
+                        if table == 'messages':
+                            d_tmp[name] = int(values[0])
+                        elif table == 'regions':
+                            d_tmp[name] = {}
+                            d_tmp[name]['number'] = int(values[0])
+                            d_tmp[name]['documented'] = float(values[3])
+                        elif table == 'metrics':
+                            d_tmp[name] = {}
+                            d_tmp[name]['number'] = int(values[0])
+                            d_tmp[name]['percent'] = float(values[1])
+                        elif table == 'messagesByCategory':
+                            d_tmp[name] = int(values[0])
+                        elif table == 'duplication':
+                            try:
+                                d_tmp[name] = int(values[0])
+                            except:
+                                d_tmp[name] = float(values[0])
+
+                    d[key][table] = d_tmp
 
     def parse_debug(self, fn):
         d = {}
@@ -102,11 +140,11 @@ class PyLint():
             d[key] = {}
             d[key]['errors'] = []
             d[key]['duplication'] = []
-            d[key]['stats'] = []
+            d[key]['regions'] = []
             d[key]['messagesByCategory'] = []
             d[key]['messages'] = []
             d[key]['global'] = []
-            d[key]['raw'] = []
+            d[key]['metrics'] = []
             for l in f:
                 if l is None or '':
                     pass
@@ -117,7 +155,7 @@ class PyLint():
                 elif 'Duplication' in l:
                     tableKey = 'duplication'
                 elif 'Statistics by type' in l:
-                    tableKey = 'stats'
+                    tableKey = 'regions'
                 elif 'Messages by category' in l:
                     tableKey = 'messagesByCategory'
                 elif l.strip() == 'Messages':
@@ -125,20 +163,45 @@ class PyLint():
                 elif 'Global evaluation' in l:
                     tableKey = 'global'
                 elif 'Raw metrics' in l:
-                    tableKey = 'raw'
+                    tableKey = 'metrics'
+                elif 'External dependencies' in l:
+                    tableKey = 'dependencies'
                 elif tableKey is not None and re.search(r"[a-z]", l) is not None:
-                    d[key][tableKey].append(l.strip())
+                    if tableKey is not 'errors' and tableKey is not 'global' and tableKey is not 'dependencies':
+                        tmp = l.strip()
+                        d[key][tableKey].append([s.strip() for s in tmp.split('|')][1:-1])
+                    else:
+                        d[key][tableKey].append(l.strip())
 
         for table in d[key].keys():
-            if table is not 'errors' and table is not 'global':
-                colnames = [s.strip() for s in d[key][table][0].split('|')][1:-1]
-                print
-                print colnames
+            if table is not 'errors' and table is not 'global' and table is not 'dependencies':
+                # colnames = d[key][table][0]
+                d_tmp = {}
                 for i in range(1, len(d[key][table])):
-                    row = [s.strip() for s in d[key][table][i].split('|')][1:-1]
+                    row = d[key][table][i]
                     name = row[0]
                     values = row[1:]
-                    print name, values
+
+                    if table == 'messages':
+                        d_tmp[name] = int(values[0])
+                    elif table == 'regions':
+                        d_tmp[name] = {}
+                        d_tmp[name]['number'] = int(values[0])
+                        d_tmp[name]['documented'] = float(values[3])
+                    elif table == 'metrics':
+                        d_tmp[name] = {}
+                        d_tmp[name]['number'] = int(values[0])
+                        d_tmp[name]['percent'] = float(values[1])
+                    elif table == 'messagesByCategory':
+                        d_tmp[name] = int(values[0])
+                    elif table == 'duplication':
+                        try:
+                            d_tmp[name] = int(values[0])
+                        except:
+                            d_tmp[name] = float(values[0])
+
+                d[key][table] = d_tmp
+                print d_tmp
 
 
 class Radon():
@@ -177,4 +240,4 @@ class Radon():
 # test/debug
 if __name__ == '__main__':
     pl = PyLint()
-    pl.parse_debug('../sandbox/pylint/Amuse/CDG_gd.txt')
+    pl.parse_debug('../sandbox/pylint/Amuse/ez_setup.txt')
