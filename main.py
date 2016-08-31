@@ -9,6 +9,7 @@ with open('data/mmodel-survey-tools.csv', 'rb') as csvfile:
         row = {k.lower(): v for k, v in row.items()}
         surveyTools.append(row)
 
-tool = mmsa.MModelTool(**surveyTools[1])
+for toolInfo in surveyTools:
+    tool = mmsa.MModelTool(**toolInfo)
 
-result = tool.analyze()
+    result = tool.analyze()
