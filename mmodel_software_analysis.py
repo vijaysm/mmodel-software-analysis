@@ -117,9 +117,9 @@ class MModelTool:
     def analyzePyLint(self):
         # run pylint if installed and source contains Python code
         if utils.commands.cmd_exists("pylint") and self.python is True:
-            # execCommand("mkdir -p " + sandbox_dir + "/pylint")
-            # execCommandStreaming("find " + sandbox_dir + "/" + self.name + "/ -name '*.py' | xargs pylint -E > " + sandbox_dir + "/pylint/" + self.name + ".txt")
+
             utils.commands.execCommand("mkdir -p " + sandbox_dir + "/pylint")
+            utils.commands.execCommand("mkdir -p " + sandbox_dir + "/pylint/" + self.name)
 
             print '[', self.name, ']', 'Performing static analysis on Python sources, with PyLint'
             if not self.paths:
@@ -128,9 +128,13 @@ class MModelTool:
                 pysrc_dirs = " ".join([(sandbox_dir + "/" + self.name + "/" + s) for s in self.paths])
             print '[', self.name, ']', 'Python source directories =', pysrc_dirs
 
-            utils.commands.execCommandStreaming("pylint -E " + pysrc_dirs + " > " + sandbox_dir + "/pylint/" + self.name + ".txt")
-            pylintErrors = utils.commands.execCommand("grep '^E:' " + sandbox_dir + "/pylint/" + self.name + ".txt | wc -l")
-            print '[', self.name, ']', 'Number of errors detected by PyLint:', pylintErrors
+            files = []
+            for dirpath, dirnames, filenames in os.walk(pysrc_dirs):
+                for filename in [f for f in filenames if f.endswith(".py")]:
+                    files.append(os.path.join(dirpath, filename))
+
+            for f in files:
+                utils.commands.execCommandStreaming('pylint %s > %s/pylint/%s/%s.txt' % (f, sandbox_dir, self.name, os.path.basename(f)[:-3]))
 
         # TODO: parse output and return stats
 

@@ -1,4 +1,5 @@
 import re
+import os
 
 
 class Attribute:
@@ -20,8 +21,7 @@ class MetrixPP:
 
     def parse(self, fn):
         with open(fn, 'r') as f:
-            lines = f.readlines()
-            for l in lines:
+            for l in f:
                 if ':: ' and "'"in l:
                     param = l.split("'")[1]
                 elif 'Average' in l:
@@ -67,11 +67,16 @@ class CPPcheck():
 
 
 class PyLint():
-    def __init__(self):
-        pass
+    def __init__(self, srcDir):
+        self.files = []
+        for dirpath, dirnames, filenames in os.walk(srcDir):
+            for filename in [f for f in filenames if f.endswith(".py")]:
+                self.files.append(os.path.join(dirpath, filename))
 
-    def parse(self, fn):
-        pass
+    def parse(self):
+        with open(fn, 'r') as f:
+            for l in f:
+                print l
 
 
 class Radon():
@@ -83,8 +88,7 @@ class Radon():
         d = {}
         file_key = None
         with open(fn, 'r') as f:
-            lines = f.readlines()
-            for l in lines:
+            for l in f:
                 if ':' in l:
                     key, val = l.split(':')
                     key = key.strip().lower()
@@ -110,9 +114,5 @@ class Radon():
 
 # test/debug
 if __name__ == '__main__':
-    # mpp = MetrixPP()
-    # mpp.parse('./sandbox/metrixpp/mpp-DTK.txt')
-    # print mpp.lines.comments.total
-
-    r = Radon()
-    print r.parse('../sandbox/radon/DTK.txt')
+    pl = PyLint()
+    pl.parse('/home/sean/Desktop/temp.txt')
