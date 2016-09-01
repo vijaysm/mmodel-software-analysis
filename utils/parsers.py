@@ -13,7 +13,10 @@ class MetrixPP:
                 if ':: ' and "'"in l:
                     param = l.split("'")[1]
                 elif 'Average' in l:
-                    avg = float(re.findall(r"[-+]?\d*\.\d+|\d+", l.split(':')[-1].strip())[0])
+                    try:
+                        avg = float(re.findall(r"[-+]?\d*\.\d+|\d+", l.split(':')[-1].strip())[0])
+                    except:
+                        avg = None
                 elif 'Total' in l:
                     tot = float(re.findall(r"[-+]?\d*\.\d+|\d+", l.split(':')[-1].strip())[0])
 
@@ -63,7 +66,7 @@ class PyLint():
                 self.files.append(os.path.join(dirpath, filename))
 
         for fn in self.files:
-            key = os.path.basename(fn)
+            key = os.path.basename(fn).split('.')[0] + '.py'
             d[key] = {}
             d[key]['errors'] = []
             d[key]['duplication'] = []
@@ -73,7 +76,6 @@ class PyLint():
             d[key]['global'] = []
             d[key]['metrics'] = []
             tableKey = None
-            print fn
             with open(fn, 'r') as f:
                 for l in f:
                     if l is None or '':
@@ -117,7 +119,7 @@ class PyLint():
                         elif table == 'regions':
                             d_tmp[name] = {}
                             d_tmp[name]['number'] = int(values[0])
-                            d_tmp[name]['documented'] = float(values[3])
+                            d_tmp[name]['percentDocumented'] = float(values[3])
                         elif table == 'metrics':
                             d_tmp[name] = {}
                             d_tmp[name]['number'] = int(values[0])
@@ -131,6 +133,7 @@ class PyLint():
                                 d_tmp[name] = float(values[0])
 
                     d[key][table] = d_tmp
+        return d
 
     def parse_debug(self, fn):
         d = {}
@@ -214,8 +217,12 @@ class Radon():
         file_key = None
         with open(fn, 'r') as f:
             for l in f:
-                if ':' in l:
+                if 'ERROR:' in l:
+                    pass
+                elif ':' in l:
+
                     key, val = l.split(':')
+
                     key = key.strip().lower()
                     val = val.strip().lower()
 
@@ -239,5 +246,5 @@ class Radon():
 
 # test/debug
 if __name__ == '__main__':
-    pl = PyLint()
-    pl.parse_debug('../sandbox/pylint/Amuse/ez_setup.txt')
+    m = Radon()
+    m.parse('../sandbox/radon/Kratos.txt')

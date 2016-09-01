@@ -3,6 +3,7 @@ import os
 
 import utils.repository
 import utils.commands
+import utils.parsers
 from utils import sandbox_dir
 
 subprocess.call(["mkdir", "-p", sandbox_dir])
@@ -137,6 +138,32 @@ class MModelTool:
                 utils.commands.execCommandStreaming('pylint %s > %s/pylint/%s/%s.txt' % (f, sandbox_dir, self.name, os.path.basename(f)[:-3]))
 
         # TODO: parse output and return stats
+
+    def parse(self):
+        d = {}
+
+        mppFp = os.path.join(sandbox_dir, 'metrixpp/mpp-%s.txt' % self.name)
+        radonFp = os.path.join(sandbox_dir, 'radon/%s.txt' % self.name)
+        pylintFp = os.path.join(sandbox_dir, 'pylint/%s/' % self.name)
+
+        if os.path.isfile(mppFp):
+            m = utils.parsers.MetrixPP()
+            d['metrix'] = m.parse(mppFp)
+
+        if os.path.isfile(radonFp):
+            r = utils.parsers.Radon()
+            d['radon'] = r.parse(radonFp)
+
+        if os.path.isdir(pylintFp):
+            try:
+                # if empty, remove
+                os.rmdir(pylintFp)
+            except:
+                # otherwise, run parser
+                p = utils.parsers.PyLint()
+                d['pylint'] = p.parse(pylintFp)
+
+        return d
 
     def analyzeFortran(self):
         # TODO: add commands used for assessing Fortran source
