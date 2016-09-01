@@ -37,3 +37,4 @@ print "\tWe had to go pretty deep to get that 0, but you get the idea."
 print
 print "\tMetrixPP: has a key for each parameter d['DTK']['metrix'].keys() ="
 print '\t', d['DTK']['metrix'].keys()
+print '\tEach of the above keys should contain values for "average" and "total".'
