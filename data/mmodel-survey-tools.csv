@@ -1,5 +1,5 @@
 Name,Languages,VCS,Repository,Paths
-AiiDA,Python,Git,https://bitbucket.org/aiida_team/aiida_core.git,aiida
+AiiDA,Python,Git,https://github.com/aiidateam/aiida_core/,aiida
 Amuse,Python,Git,https://github.com/amusecode/amuse.git,
 Cactus,C/C++/Fortran,Git,https://bitbucket.org/cactuscode/utilities/raw/Cactus_4.3.0/ThornLists/Cactus_4.3.0.th,https://raw.github.com/gridaphobe/CRL/Cactus_4.3.0/GetComponents
 DTK,C++,Git,https://github.com/ORNL-CEES/DataTransferKit.git,
