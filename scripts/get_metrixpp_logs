@@ -24,10 +24,10 @@ MPP_COLLECT_OPTIONS="--sccc --sclent --sctc --scmn --sclc --sclcom --sclt --sgs 
 MPP_VIEW_OPTIONS="--log-level=ERROR"
 
 # Query and store data in a variable
-MPP_COLLECT_LOG="python contrib/metrixplusplus-1.3.168/metrix++.py collect --db-file=$METRIXPP_OUTDB $MPP_COLLECT_OPTIONS $PACKAGE_SRCDIRS"
+MPP_COLLECT_LOG="python2 contrib/metrixplusplus-1.3.168/metrix++.py collect --db-file=$METRIXPP_OUTDB $MPP_COLLECT_OPTIONS $PACKAGE_SRCDIRS"
 
 # Generate HTML output from the cppcheck scripts
-MPP_VIEW_LOGS="python contrib/metrixplusplus-1.3.168/metrix++.py view --db-file=$METRIXPP_OUTDB $MPP_VIEW_OPTIONS > $METRIXPP_SUMMARY"
+MPP_VIEW_LOGS="python2 contrib/metrixplusplus-1.3.168/metrix++.py view --db-file=$METRIXPP_OUTDB $MPP_VIEW_OPTIONS > $METRIXPP_SUMMARY"
 
 echo "$MPP_COLLECT_LOG"
 eval "$MPP_COLLECT_LOG"

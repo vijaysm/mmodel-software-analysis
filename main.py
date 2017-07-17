@@ -15,7 +15,7 @@ for toolInfo in surveyTools:
     tool = mmsa.MModelTool(**toolInfo)
     print tool.name
 
-    # result = tool.analyze()
+    result = tool.analyze()
     d[tool.name] = tool.parse()
 
 np.save('mmodel_dictionary.npy', d)

@@ -19,6 +19,10 @@ for t in d.keys():
     docs = 0
     for a in d[t]:
         if a == 'metrix' and d[t][a] is not None:
+
+            print(t, a)
+            print(d[t][a])
+            quit()
             comments += d[t][a]['std.code.lines:comments']['total']
             lines += d[t][a]['std.code.lines:code']['total']
             size += d[t][a]['std.general:size']['total']
@@ -51,7 +55,6 @@ for t in d.keys():
             errors += nerrors
             docs += ldocs
 
-
     final['tool'].append(t)
     final['lines'].append(lines)
     final['comments'].append(comments)
@@ -63,11 +66,6 @@ final = pd.DataFrame(final)
 final['cpl'] = final['comments'] / final['lines']
 final['epl'] = final['errors'] / final['lines']
 final['dpl'] = final['docs'] / final['lines']
-
-ax = sns.barplot(x='tool', y='size', data=final)
-plt.xticks(rotation=90)
-plt.ylabel('Size (bytes)')
-plt.show()
 
 ax = sns.barplot(x='tool', y='lines', data=final)
 plt.xticks(rotation=90)
