@@ -1,5 +1,5 @@
 Name,Languages,VCS,Repository,Paths
-AiiDA,Python,Git,https://bitbucket.org/aiida_team/aiida_core.git,aiida
+AiiDA,Python,Git,https://github.com/aiidateam/aiida_core/,aiida
 Amuse,Python,Git,https://github.com/amusecode/amuse.git,
 Cactus,C/C++/Fortran,Git,https://bitbucket.org/cactuscode/utilities/raw/Cactus_4.3.0/ThornLists/Cactus_4.3.0.th,https://raw.github.com/gridaphobe/CRL/Cactus_4.3.0/GetComponents
 DTK,C++,Git,https://github.com/ORNL-CEES/DataTransferKit.git,
@@ -29,3 +29,4 @@ Galaxy,Python,Git,https://github.com/galaxyproject/galaxy/,
 HTCondor,C++,Git,https://github.com/htcondor/htcondor,
 Kepler,Java,Subversion,https://code.kepler-project.org/code/kepler/releases/release-branches/build-area-2.4,
 OpenMI,C++/C#/Java,None,http://downloads.sourceforge.net/project/openmi/Version_2.0.0.0/Standard_2.0.0.0.zip,
+MUSCLE2,C++/Java/MATLAB/Python/Ruby,Git,https://github.com/psnc-apps/muscle2,
