@@ -37,9 +37,11 @@ class MModelTool:
                 return utils.repository.getMercurialRepo(self.name, self.repository)
             elif self.vcs == 'Subversion':
                 return utils.repository.getSVNRepo(self.name, self.repository)
-            elif self.vcs == 'None':
+            elif self.vcs == 'Tar':
                 return utils.repository.getTarball(self.name, self.repository)
-            else:
+            elif self.vcs == 'Zip':
+                return utils.repository.getZip(self.name, self.repository)
+            elif self.vcs is None:
                 raise ValueError('[' + self.name + ']' + 'Unhandled VCS type. Please check the key: ' + self.vcs + ' and URL:' + self.repository)
 
     def checkSource(self):

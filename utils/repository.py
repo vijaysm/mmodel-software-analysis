@@ -32,6 +32,16 @@ def getTarball(toolname, url):
     return wgetcommand + "\n" + untarcommand
 
 
+def getZip(toolname, url):
+    filename = commands.execCommand("basename " + url)
+    print '[', toolname, ']', 'Downloading tarball from URL:', url
+    wgetcommand = commands.execCommand("wget -O " + sandbox_dir + "/" + filename + " " + url)
+    commands.execCommand("mkdir -p " + sandbox_dir + "/" + toolname)
+    print '[', toolname, ']', 'Deflating the zip into the directory:', sandbox_dir + "/" + toolname
+    unzipcommand = commands.execCommand("unzip " + sandbox_dir + "/" + filename + " -d " + sandbox_dir + "/" + toolname)
+    return wgetcommand + "\n" + unzipcommand
+
+
 def getCactusRepo(toolname, thornListURL, getComponentsURL):
     currentPath = os.getcwd()
     os.chdir(sandbox_dir)
