@@ -13,7 +13,6 @@ with open('data/mmodel-survey-tools.csv', 'rb') as csvfile:
 d = {}
 for toolInfo in surveyTools:
     tool = mmsa.MModelTool(**toolInfo)
-    print tool.name
 
     result = tool.analyze()
     d[tool.name] = tool.parse()

@@ -18,23 +18,20 @@ for t in d.keys():
     errors = 0
     docs = 0
     for a in d[t]:
-        if a == 'metrix' and d[t][a] is not None:
+        if a == 'metrix' and bool(d[t][a]):
 
-            print(t, a)
-            print(d[t][a])
-            quit()
             comments += d[t][a]['std.code.lines:comments']['total']
             lines += d[t][a]['std.code.lines:code']['total']
             size += d[t][a]['std.general:size']['total']
 
-        elif a == 'radon' and d[t][a] is not None:
+        elif a == 'radon' and bool(d[t][a]):
             try:
                 comments += d[t][a]['total']['comments']
                 lines += d[t][a]['total']['loc']
             except:
                 pass
 
-        elif a == 'pylint' and d[t][a] is not None:
+        elif a == 'pylint' and bool(d[t][a]):
             llines = 0
             lcomments = 0
             lsize = 0

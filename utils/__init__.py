@@ -1,2 +1,2 @@
 
-sandbox_dir = './sandbox'
+sandbox_dir = '/extra/ideas/'

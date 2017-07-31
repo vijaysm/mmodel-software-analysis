@@ -183,7 +183,7 @@ class MModelTool:
 
         # 3) Run Metrix++ for C/C++/Java and cppcheck for C/C++
         self.analyzeMetrixPP()
-        self.analyzeCPPcheck()
+        # self.analyzeCPPcheck()
 
         # 4) Run PyLint and Radon for Python
         self.analyzeRadon()
