@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+from stacked_bar import *
+from colour import *
 
 
 # path to saved dictionary
@@ -10,7 +12,7 @@ fp = './mmodel_dictionary.npy'
 # load the dictionary
 d = np.load(fp).item()
 
-final = {'tool': [], 'lines': [], 'comments': [], 'errors': [], 'docs': [], 'size': []}
+final = {'tool': [], 'Code': [], 'Comments': [], 'Errors': [], 'Docstrings': [], 'Size': []}
 for t in d.keys():
     comments = 0
     lines = 0
@@ -53,33 +55,48 @@ for t in d.keys():
             docs += ldocs
 
     final['tool'].append(t)
-    final['lines'].append(lines)
-    final['comments'].append(comments)
-    final['errors'].append(errors)
-    final['docs'].append(docs)
-    final['size'].append(size)
+    final['Code'].append(lines)
+    final['Comments'].append(comments)
+    final['Errors'].append(errors)
+    final['Docstrings'].append(docs)
+    final['Size'].append(size)
 
 final = pd.DataFrame(final)
-final['cpl'] = final['comments'] / final['lines']
-final['epl'] = final['errors'] / final['lines']
-final['dpl'] = final['docs'] / final['lines']
+final['cpl'] = final['Comments'] / final['Code']
+final['epl'] = final['Errors'] / final['Code']
+final['dpl'] = final['Docstrings'] / final['Code']
 
-ax = sns.barplot(x='tool', y='lines', data=final)
-plt.xticks(rotation=90)
-plt.ylabel('LOC')
-plt.show()
+final.sort_values(by='tool', inplace=True)
+final.index = final['tool']
 
-ax = sns.barplot(x='tool', y='cpl', data=final)
-plt.xticks(rotation=90)
-plt.ylabel('Comments per LOC')
-plt.show()
+# stacked_bar_chart(final, ['Code', 'Comments', 'Docstrings'], 'tool', 'Lines', 'stacked.png', Color('lightgray'), Color('gray'))
 
-ax = sns.barplot(x='tool', y='epl', data=final)
-plt.xticks(rotation=90)
-plt.ylabel('Errors per LOC')
-plt.show()
+# ax = sns.barplot(x='tool', y='Code', data=final, color='gray')
+# plt.xticks(rotation=90)
+# ax.set_yscale("log")
+# plt.ylabel('LOC')
+# plt.show()
 
-ax = sns.barplot(x='tool', y='dpl', data=final)
+# ax = sns.barplot(x='tool', y='cpl', data=final, color='gray')
+# plt.xticks(rotation=90)
+# ax.set(xlabel='', ylabel='Comments per LOC')
+# ax.tick_params(bottom='off')
+# plt.tight_layout()
+# plt.savefig('cploc.png')
+# plt.close()
+
+ax = sns.barplot(x='tool', y='epl', data=final, color='gray')
 plt.xticks(rotation=90)
-plt.ylabel('Docstrings per LOC')
-plt.show()
+ax.set(xlabel='', ylabel='Errors per LOC')
+ax.tick_params(bottom='off')
+plt.tight_layout()
+plt.savefig('eplc.png')
+plt.close()
+
+ax = sns.barplot(x='tool', y='dpl', data=final, color='gray')
+plt.xticks(rotation=90)
+ax.set(xlabel='', ylabel='Docstrings per LOC')
+ax.tick_params(bottom='off')
+plt.tight_layout()
+plt.savefig('dplc.png')
+plt.close()
