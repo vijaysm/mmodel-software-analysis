@@ -229,7 +229,7 @@ class Radon():
                     try:
                         d_tmp[key] = int(val)
                     except:
-                        pass
+                        d_tmp[key] = val
 
                     if key == 'blank':
                         d[file_key] = d_tmp
