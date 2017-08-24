@@ -28,7 +28,7 @@ for t in data.keys():
                 d['Comments'] = data[t][a]['std.code.lines:comments']['total']
                 d['Code'] = data[t][a]['std.code.lines:code']['total']
                 d['Complexity'] = data[t][a]['std.code.complexity:cyclomatic']['total']
-                # d['Errors'] = data[t][a]['std.general.procerrors']   
+                d['Errors'] = data[t][a]['std.general:procerrors']['total']
                 metrix.append(d)
 
         if 'python' in languages:
