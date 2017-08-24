@@ -15,6 +15,6 @@ for toolInfo in surveyTools:
     tool = mmsa.MModelTool(**toolInfo)
 
     result = tool.analyze()
-    d[tool.name] = tool.parse()
+    # d[tool.name] = tool.parse()
 
-np.save('mmodel_dictionary.npy', d)
+# np.save('mmodel_dictionary.npy', d)

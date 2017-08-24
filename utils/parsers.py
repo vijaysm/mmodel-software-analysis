@@ -111,26 +111,24 @@ class PyLint():
                     d_tmp = {}
                     for i in range(1, len(d[key][table])):
                         row = d[key][table][i]
-                        name = row[0]
-                        values = row[1:]
+                        if len(row) > 0:
+                            name = row[0]
+                            values = row[1:]
 
-                        if table == 'messages':
-                            d_tmp[name] = int(values[0])
-                        elif table == 'regions':
-                            d_tmp[name] = {}
-                            d_tmp[name]['number'] = int(values[0])
-                            d_tmp[name]['percentDocumented'] = float(values[3])
-                        elif table == 'metrics':
-                            d_tmp[name] = {}
-                            d_tmp[name]['number'] = int(values[0])
-                            d_tmp[name]['percent'] = float(values[1])
-                        elif table == 'messagesByCategory':
-                            d_tmp[name] = int(values[0])
-                        elif table == 'duplication':
-                            try:
+                            if table == 'messages':
                                 d_tmp[name] = int(values[0])
-                            except:
-                                d_tmp[name] = float(values[0])
+                            elif table == 'regions':
+                                d_tmp[name] = {}
+                                d_tmp[name]['number'] = int(values[0])
+                                d_tmp[name]['percentDocumented'] = float(values[3])
+                            elif table == 'metrics':
+                                d_tmp[name] = {}
+                                d_tmp[name]['number'] = int(values[0])
+                                d_tmp[name]['percent'] = float(values[1])
+                            elif table == 'messagesByCategory':
+                                d_tmp[name] = int(values[0])
+                            elif table == 'duplication':
+                                pass
 
                     d[key][table] = d_tmp
         return d
