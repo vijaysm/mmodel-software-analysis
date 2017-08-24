@@ -182,12 +182,12 @@ class MModelTool:
         result.sourceCounts = self.checkSource()
 
         # 3) Run Metrix++ for C/C++/Java and cppcheck for C/C++
-        self.analyzeMetrixPP()
+        # self.analyzeMetrixPP()
         # self.analyzeCPPcheck()
 
         # 4) Run PyLint and Radon for Python
-        # self.analyzeRadon()
-        # self.analyzePyLint()
+        self.analyzeRadon()
+        self.analyzePyLint()
 
         # TODO: 5) Run * for Fortran
         # self.analyzeFortran()

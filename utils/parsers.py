@@ -224,6 +224,9 @@ class Radon():
                     key = key.strip().lower()
                     val = val.strip().lower()
 
+                    if key == 'average complexity':
+                        d['Complexity'] = float(val.split('(')[-1].split(')')[0])
+
                     try:
                         d_tmp[key] = int(val)
                     except:
