@@ -57,7 +57,7 @@ for t in data.keys():
             elif a == 'radon' and bool(data[t][a]):
                 d = {}
                 d['tool'] = t
-                d['Complexity'] = data[t][a].keys()
+                d['Complexity'] = data[t][a]['Complexity']
                 print(d['Complexity'])
                 quit()
 
