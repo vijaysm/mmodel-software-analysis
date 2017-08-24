@@ -8,7 +8,7 @@ else
 fi
 
 # remove old log directory and recreate if needed
-CPPCHECK_OUTDIR="sandbox/cppcheck/cppcheck-$PACKAGE"
+CPPCHECK_OUTDIR="/extra/ideas/cppcheck/cppcheck-$PACKAGE"
 mkdir -p $CPPCHECK_OUTDIR
 
 if [ $# -gt 1 ]

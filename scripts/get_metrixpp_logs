@@ -8,9 +8,9 @@ else
 fi
 
 # remove old log directory and recreate if needed
-METRIXPP_OUTDB="sandbox/metrixpp/mpp-${PACKAGE}.db"
-METRIXPP_SUMMARY="sandbox/metrixpp/mpp-${PACKAGE}.txt"
-mkdir -p "sandbox/metrixpp"
+METRIXPP_OUTDB="/extra/ideas/metrixpp/mpp-${PACKAGE}.db"
+METRIXPP_SUMMARY="/extra/ideas/metrixpp/mpp-${PACKAGE}.txt"
+mkdir -p "/extra/ideas/metrixpp"
 
 if [ $# -gt 1 ]
 then
@@ -20,7 +20,7 @@ else
   PACKAGE_SRCDIRS="."
 fi
 
-MPP_COLLECT_OPTIONS="--sccc --sclent --sctc --scmn --sclc --sclcom --sclt --sgs --log-level=ERROR"
+MPP_COLLECT_OPTIONS="--sccc --sclent --sctc --scmn --sclc --sclcom --sclt --sgs --std.general.procerrors --log-level=ERROR"
 MPP_VIEW_OPTIONS="--log-level=ERROR"
 
 # Query and store data in a variable

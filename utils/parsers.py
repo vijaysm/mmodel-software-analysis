@@ -36,6 +36,8 @@ class MetrixPP:
                         key = 'std.code.lines:code'
                     elif param == 'std.code.lines:comments':
                         key = 'std.code.lines:comments'
+                    elif param == 'std.general:procerrors':
+                        key = 'std.general:procerrors'
 
                     d[key] = {}
                     d[key]['average'] = avg
