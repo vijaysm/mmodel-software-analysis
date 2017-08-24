@@ -72,6 +72,7 @@ metrix = pd.DataFrame(metrix)
 metrix.sort_values(by='Tool', inplace=True)
 metrix.index = metrix['Tool']
 metrix['cpl'] = metrix['Comments'] / metrix['Code']
+metrix['epl'] = metrix['Errors'] / metrix['Code']
 
 # radon prep
 radon = pd.DataFrame(radon)
@@ -109,6 +110,15 @@ ax.tick_params(bottom='off')
 plt.tight_layout()
 # plt.show()
 plt.savefig('figs/python_eplc.png')
+plt.close()
+
+ax = sns.barplot(x='Tool', y='epl', data=metrix, color='gray')
+plt.xticks(rotation=90)
+ax.set(xlabel='', ylabel='Errors per LOC')
+ax.tick_params(bottom='off')
+plt.tight_layout()
+# plt.show()
+plt.savefig('figs/cpp_eplc.png')
 plt.close()
 
 # cyclomatic complexity
