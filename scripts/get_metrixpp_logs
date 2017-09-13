@@ -8,9 +8,9 @@ else
 fi
 
 # remove old log directory and recreate if needed
-METRIXPP_OUTDB="/extra/ideas/metrixpp/mpp-${PACKAGE}.db"
-METRIXPP_SUMMARY="/extra/ideas/metrixpp/mpp-${PACKAGE}.txt"
-mkdir -p "/extra/ideas/metrixpp"
+METRIXPP_OUTDB="sandbox/metrixpp/mpp-${PACKAGE}.db"
+METRIXPP_SUMMARY="sandbox/metrixpp/mpp-${PACKAGE}.txt"
+mkdir -p "sandbox/metrixpp"
 
 if [ $# -gt 1 ]
 then
