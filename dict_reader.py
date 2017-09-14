@@ -19,10 +19,12 @@ metrix = []
 radon = []
 for t in data.keys():
     languages = [x.lower() for x in tools.loc[tools['Name'] == t]['Languages'].values[0].split('/')]
-
+    print(t)
     for a in data[t]:
-        if 'c' in languages or 'c++' in languages or 'java' in languages:
-            if a == 'metrix' and bool(data[t][a]):
+        print('\t%s' % a)
+        # if 'c' in languages or 'c++' in languages or 'java' in languages:
+        if a == 'metrix':
+            if bool(data[t][a]):
                 d = {}
                 d['Tool'] = t
                 d['Comments'] = data[t][a]['std.code.lines:comments']['total']
@@ -30,9 +32,18 @@ for t in data.keys():
                 d['Complexity'] = data[t][a]['std.code.complexity:cyclomatic']['total']
                 d['Errors'] = data[t][a]['std.general:procerrors']['total']
                 metrix.append(d)
+            else:
+                d = {}
+                d['Tool'] = t
+                d['Comments'] = np.nan
+                d['Code'] = np.nan
+                d['Complexity'] = np.nan
+                d['Errors'] = np.nan
+                metrix.append(d)
 
-        if 'python' in languages:
-            if a == 'pylint' and bool(data[t][a]):
+        # if 'python' in languages:
+        elif a == 'pylint':
+            if bool(data[t][a]):
                 d = {}
                 lines = 0
                 comments = 0
@@ -54,11 +65,33 @@ for t in data.keys():
                 d['Docstrings'] = docs
                 d['Errors'] = errors
                 pylint.append(d)
-            elif a == 'radon' and bool(data[t][a]):
+            else:
                 d = {}
                 d['Tool'] = t
-                d['Complexity'] = data[t][a]['Complexity']
+                d['Code'] = np.nan
+                d['Comments'] = np.nan
+                d['Docstrings'] = np.nan
+                d['Errors'] = np.nan
+                pylint.append(d)
+
+        elif a == 'radon':
+            if bool(data[t][a]):
+                d = {}
+                d['Tool'] = t
+                try:
+                    d['Complexity'] = data[t][a]['Complexity']
+                    radon.append(d)
+                except:
+                    d = {}
+                    d['Tool'] = t
+                    d['Complexity'] = np.nan
+                    radon.append(d)
+            else:
+                d = {}
+                d['Tool'] = t
+                d['Complexity'] = np.nan
                 radon.append(d)
+
 
 # pylint prep
 pylint = pd.DataFrame(pylint)

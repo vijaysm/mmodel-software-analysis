@@ -1,5 +1,5 @@
 Name,Languages,VCS,Repository,Paths
-AiiDA,Python,Git,https://github.com/aiidateam/aiida_core/,aiida
+AiiDA,Python,Git,https://github.com/aiidateam/aiida_core/,
 Airavata,C++/Java,Git,https://github.com/apache/airavata.git,
 Amuse,Python,Git,https://github.com/amusecode/amuse.git,
 Arcos-Amanzi,C/C++/Fortran,Git,https://github.com/amanzi/amanzi.git,

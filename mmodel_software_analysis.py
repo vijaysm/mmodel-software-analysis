@@ -186,8 +186,8 @@ class MModelTool:
         # self.analyzeCPPcheck()
 
         # 4) Run PyLint and Radon for Python
-        # self.analyzeRadon()
-        # self.analyzePyLint()
+        self.analyzeRadon()
+        self.analyzePyLint()
 
         # TODO: 5) Run * for Fortran
         # self.analyzeFortran()
